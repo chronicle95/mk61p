@@ -29,6 +29,7 @@ typedef struct Ik13
 
 	// internal stuff
 	Cmd23 command;
+	U8 synaddr;
 	ALU   alu;
 	Reg42 m;
 	Reg42 r;

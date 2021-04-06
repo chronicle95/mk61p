@@ -154,6 +154,7 @@ void Ik13_init(Ik13 *p, Cmd23 *rom_cmd, Synch *rom_syn, UCmd28 *rom_ucmd)
 	p->commands = rom_cmd;
 	p->sprograms = rom_syn;
 	p->ucommands = rom_ucmd;
+	p->synaddr = 0;
 	p->s = 0;
 	p->s1 = 0;
 	p->l = 0;
@@ -189,7 +190,6 @@ void Ik13_step(Ik13 *p)
 	}
 
 	// derive synchroprogram address from command word
-	U8 synaddr = 0;
 	U8 nine_idx = p->tick / 9;
 	U8 nine_mod = p->tick % 9;
 	if ((nine_mod == 0) && !((nine_idx > 0) && (nine_idx < 3)))
@@ -197,33 +197,33 @@ void Ik13_step(Ik13 *p)
 		if (nine_idx < 3)
 		{
 			// use lower 7 bits
-			synaddr = p->command.byte[0] & 0b1111111;
+			p->synaddr = p->command.byte[0] & 0b1111111;
 		}
 		else if (nine_idx == 3)
 		{
 			// use middle 7 bits
-			synaddr = ((p->command.byte[1] & 0b111111) << 1)
+			p->synaddr = ((p->command.byte[1] & 0b111111) << 1)
 				| (p->command.byte[0] >> 7);
 		}
 		else if (nine_idx == 4)
 		{
 			// use upper 8 bits
-			synaddr = (p->command.byte[2] << 2) | (p->command.byte[1] >> 6);
-			if (synaddr > 31)
+			p->synaddr = (p->command.byte[2] << 2) | (p->command.byte[1] >> 6);
+			if (p->synaddr > 31)
 			{
 				if (p->tick == 36)
 				{
-					nibble_write (p->r.byte, 37, synaddr);
-					nibble_write (p->r.byte, 40, synaddr >> 4);
+					nibble_write (p->r.byte, 37, p->synaddr);
+					nibble_write (p->r.byte, 40, p->synaddr >> 4);
 				}
-				synaddr = 95;
+				p->synaddr = 95;
 			}
 		}
 
 	}
 
 	// derive microcommand address from synchroprogram in a strange way
-	memcpy_P (&scmd, &p->sprograms[synaddr], sizeof (Synch));
+	memcpy_P (&scmd, &p->sprograms[p->synaddr], sizeof (Synch));
 	U8 ucmdaddr = scmd.byte[
 				(p->tick < 6) ? p->tick :
 				((p->tick < 21) ? (p->tick % 3 + 3) :
