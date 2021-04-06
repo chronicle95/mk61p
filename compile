@@ -1,0 +1,26 @@
+#!/bin/sh
+# shell script written by Artem Bondarenko in Nov 2015
+# updated in 2021
+
+if [ "$#" -ne 1 ]; then
+	echo "Usage: ./compile.sh <target mcu>">&2
+	exit
+fi
+
+PROJ=calc
+
+# set language to English to avoid bug in GCC
+LANG=en
+
+echo Compiling...
+avr-gcc -g -mmcu=$1 -Os -c *.c
+echo Linking...
+avr-gcc -g -mmcu=$1 -o $PROJ.out -Wl,-Map,$PROJ.map *.o
+echo Creating HEX file...
+avr-objcopy -R .eeprom -O ihex $PROJ.out $PROJ.hex
+echo Calculating sizes...
+avr-size $PROJ.out
+echo Cleaning up...
+rm $PROJ.out $PROJ.map *.o
+echo Done! Hex file: $PROJ.hex
+

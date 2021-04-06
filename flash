@@ -1,0 +1,15 @@
+#!/bin/sh
+# shell script written by Artem Bondarenko in Nov 2015
+
+if [ "$#" -ne 2 ]; then
+	echo "Must run this script as superuser!!">&2
+	echo "Usage: ./flash.sh <mcu type> <filename>">&2
+	echo "<filename> must be without extension (using *.hex)">&2
+	echo "<mcu type> is needed for avrdude">&2
+	exit
+fi
+
+echo Flashing...
+#avrdude -i 2000 -p $1 -c linuxspi -P /dev/spidev0.0 -U flash:w:$2.hex
+avrdude -i 2000 -p $1 -c usbasp -U flash:w:$2.hex
+
