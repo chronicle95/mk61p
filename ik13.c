@@ -21,9 +21,9 @@ static void Ik13_control_signal(Ik13 *p, U8 n)
 		case 9: p->alu.beta |= p->s1; break;
 		case 10: p->alu.beta |= 6; break;
 		case 11: p->alu.beta |= 1; break;
-		case 12: p->alu.gamma |= p->l; break;
-		case 13: p->alu.gamma |= ~p->l; break;
-		case 14: p->alu.gamma |= ~p->t; break;
+		case 12: p->alu.gamma |= p->l & 1; break;
+		case 13: p->alu.gamma |= ~p->l & 1; break;
+		case 14: p->alu.gamma |= ~p->t & 1; break;
 		case 15: nibble_write (p->r.byte, p->tick,
 				nibble_read (p->r.byte, (p->tick + 3) % 42)); break;
 		case 16: nibble_write (p->r.byte, p->tick, p->alu.sigma); break;
@@ -43,7 +43,7 @@ static void Ik13_control_signal(Ik13 *p, U8 n)
 		case 25: p->l = p->p; break;
 		case 26: p->s = p->s1; break;
 		case 27: p->s = p->alu.sigma; break;
-		case 28: p->s = p->s | p->alu.sigma; break;
+		case 28: p->s = p->s1 | p->alu.sigma; break;
 		case 29: p->s1 = p->alu.sigma; break;
 		case 30: p->s1 = p->s1; break; // wat?
 		case 31: p->s1 = p->s1 | p->alu.sigma; break;
@@ -104,7 +104,7 @@ static void Ik13_execute_ucommand(Ik13 *p, UCmd28 *ucommand)
 			p->s1 = p->key_y;
 			p->t  = 1;
 		}
-		p->disp_commas = ((p->l > 0) << third);
+		p->disp_commas = (p->disp_commas & ~(1 << third)) | ((p->l > 0) << third);
 		p->disp_upd = 1;
 	}
 
@@ -118,7 +118,7 @@ static void Ik13_execute_ucommand(Ik13 *p, UCmd28 *ucommand)
 	p->alu.sigma = sum & 0b1111;
 	p->p     = (sum >> 4) & 1;
 
-	if (CHECK_BIT(p->command.byte, 22) || (third == 12))
+	if (CHECK_BIT(p->command.byte, 22) || (third == 12) || (third == 13))
 	{
 		// bits 17-15 of command 
 		U8 ucfield = ((ucommand->byte[2] & 0b11) << 1) | (ucommand->byte[1] >> 7);
@@ -139,15 +139,14 @@ static void Ik13_execute_ucommand(Ik13 *p, UCmd28 *ucommand)
 			Ik13_control_signal (p, bit + 4);
 	}
 
-	U8 ucfield = ((ucommand->byte[3] & 0b1111) << 2) | (ucommand->byte[2] >> 6);
-	if (ucfield & 0b11)
-		Ik13_control_signal (p, (ucfield & 0b11) + 25);
-	ucfield >>= 2;
-	if (ucfield & 0b11)
-		Ik13_control_signal (p, (ucfield & 0b11) + 28);
-	ucfield >>= 2;
-	if (ucfield)
-		Ik13_control_signal (p, ucfield  + 31);
+	for (U8 i = 0; i < 3; i++)
+	{
+		U8 ucfield = (!!CHECK_BIT(ucommand->byte, 23 + i * 2) << 1) | !!CHECK_BIT(ucommand->byte, 22 + i * 2);
+		if (ucfield)
+		{
+			Ik13_control_signal (p, ucfield + 25 + i * 3);
+		}
+	}
 }
 
 void Ik13_init(Ik13 *p, Cmd23 *rom_cmd, Synch *rom_syn, UCmd28 *rom_ucmd)

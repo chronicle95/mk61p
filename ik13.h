@@ -51,7 +51,7 @@ typedef struct Ik13
 	U16 disp_commas;
 } Ik13;
 
-#define CHECK_BIT(arr, n) (arr[n >> 3] & (1 << (n & 7)))
+#define CHECK_BIT(arr, n) (arr[(n) >> 3] & (1 << ((n) & 7)))
 
 void Ik13_init(Ik13 *, Cmd23 *, Synch *, UCmd28 *);
 void Ik13_step(Ik13 *);
