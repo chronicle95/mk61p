@@ -73,11 +73,13 @@ void main()
 		{
 			for (U8 i = 0; i < 9; i++)
 			{
-				display_hex (i, nibble_read (p1302.r.byte, (8 - i) * 3));
+				display_hex (i, nibble_read (p1302.r.byte, (8 - i) * 3)
+						| p1302.disp_commas[9 - i]);
 			}
 			for (U8 i = 0; i < 3; i++)
 			{
-				display_hex (i + 9, nibble_read (p1302.r.byte, (11 - i) * 3));
+				display_hex (i + 9, nibble_read (p1302.r.byte, (11 - i) * 3)
+						| p1302.disp_commas[12 - i]);
 			}
 			p1302.disp_upd = 0;
 		} 

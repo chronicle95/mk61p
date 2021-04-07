@@ -49,7 +49,7 @@ typedef struct Ik13
 	U8 key_x;
 	U8 key_y;
 	U8 disp_upd;
-	U16 disp_commas;
+	U8 disp_commas[14];
 } Ik13;
 
 #define CHECK_BIT(arr, n) (arr[(n) >> 3] & (1 << ((n) & 7)))

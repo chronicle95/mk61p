@@ -104,7 +104,7 @@ static void Ik13_execute_ucommand(Ik13 *p, UCmd28 *ucommand)
 			p->s1 = p->key_y;
 			p->t  = 1;
 		}
-		p->disp_commas = (p->disp_commas & ~(1 << third)) | ((p->l > 0) << third);
+		p->disp_commas[third] = p->l;
 		p->disp_upd = 1;
 	}
 
@@ -163,13 +163,13 @@ void Ik13_init(Ik13 *p, Cmd23 *rom_cmd, Synch *rom_syn, UCmd28 *rom_ucmd)
 	for (U8 i = 0; i < sizeof (p->m.byte) ; i++) p->m.byte[i] = 0;
 	for (U8 i = 0; i < sizeof (p->r.byte) ; i++) p->r.byte[i] = 0;
 	for (U8 i = 0; i < sizeof (p->st.byte); i++) p->st.byte[i] = 0;
+	for (U8 i = 0; i < sizeof (p->disp_commas); i++) p->disp_commas[i] = 0;
 
 	p->wout = 0;
 	p->win  = 0;
 
 	p->tick = 0;
 	p->disp_upd = 0;
-	p->disp_commas = 0;
 	p->key_x = 0;
 	p->key_y = 0;
 }
