@@ -23,6 +23,7 @@
 void init_io();
 void init_timer();
 void display_hex(U8, U8);
+void key_pressed(U8 *, U8 *, U8);
 
 void main()
 {
@@ -41,55 +42,67 @@ void main()
 	Ir2_init (&m1);
 	Ir2_init (&m2);
 
+	U8 key = KEY_NONE;
+
 	// infinite simulation loop
 	for (;;)
 	{
 		p1303.key_x = SwitchValue;
 		p1303.key_y = 1;
 
-		// one full instruction cycle
-		for (U8 i = 0; i < 42; i++)
+		for (U16 j = 0; j < 560; j++)
 		{
-			p1302.win = m2.wout;
-			Ik13_step (&p1302);
+			// one full instruction cycle
+			for (U8 i = 0; i < 42; i++)
+			{
+				p1302.win = m2.wout;
+				Ik13_step (&p1302);
 
-			p1303.win = p1302.wout;
-			Ik13_step (&p1303);
+				p1303.win = p1302.wout;
+				Ik13_step (&p1303);
 
-			p1306.win = p1303.wout;
-			Ik13_step (&p1306);
+				p1306.win = p1303.wout;
+				Ik13_step (&p1306);
 
-			m1.win = p1306.wout;
-			Ir2_step (&m1);
+				m1.win = p1306.wout;
+				Ir2_step (&m1);
 
-			m2.win = m1.wout;
-			Ir2_step (&m2);
+				m2.win = m1.wout;
+				Ir2_step (&m2);
 
-			nibble_write (p1302.m.byte, (p1302.tick + 41) % 42, m2.wout);
+				nibble_write (p1302.m.byte, (p1302.tick + 41) % 42, m2.wout);
+			}
+
+			// need to update the display?
+			if (p1302.disp_upd)
+			{
+				for (U8 i = 0; i < 9; i++)
+				{
+					display_hex (i, nibble_read (p1302.r.byte, (8 - i) * 3)
+							| p1302.disp_commas[9 - i]);
+				}
+				for (U8 i = 0; i < 3; i++)
+				{
+					display_hex (i + 9, nibble_read (p1302.r.byte, (11 - i) * 3)
+							| p1302.disp_commas[12 - i]);
+				}
+				p1302.disp_upd = 0;
+			} 
+
+			// check for pressed keys
+			if (KeyValue != key)
+			{
+				key = KeyValue;
+				key_pressed (&p1302.key_x, &p1302.key_y, key);
+			}
 		}
-
-		// need to update the display?
-		if (p1302.disp_upd)
-		{
-			for (U8 i = 0; i < 9; i++)
-			{
-				display_hex (i, nibble_read (p1302.r.byte, (8 - i) * 3)
-						| p1302.disp_commas[9 - i]);
-			}
-			for (U8 i = 0; i < 3; i++)
-			{
-				display_hex (i + 9, nibble_read (p1302.r.byte, (11 - i) * 3)
-						| p1302.disp_commas[12 - i]);
-			}
-			p1302.disp_upd = 0;
-		} 
-
-		//+DEBUG
-		//-DEBUG
-
-		p1302.key_x = 0;
-		p1302.key_y = 0;
 	}
+}
+
+void key_pressed(U8 *x, U8 *y, U8 code)
+{
+	*x = pgm_read_byte (&KeyMapX[code]);
+	*y = pgm_read_byte (&KeyMapY[code]);
 }
 
 void init_io()

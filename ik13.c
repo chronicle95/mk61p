@@ -118,7 +118,7 @@ static void Ik13_execute_ucommand(Ik13 *p, UCmd28 *ucommand)
 	p->alu.sigma = sum & 0b1111;
 	p->p     = (sum >> 4) & 1;
 
-	if (CHECK_BIT(p->command.byte, 22) || (third == 12) || (third == 13))
+	if (!CHECK_BIT(p->command.byte, 22) || (third == 12) || (third == 13))
 	{
 		// bits 17-15 of command 
 		U8 ucfield = ((ucommand->byte[2] & 0b11) << 1) | (ucommand->byte[1] >> 7);

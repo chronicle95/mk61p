@@ -49,6 +49,25 @@ volatile U8 KeyValue = 0;
 #define KEY_EXP    29
 #define KEY_CX     30
 
+const U8 KeyMapX[31] PROGMEM = {
+   0,
+   11,  7,  9,  4,  2,
+   10,  8,  6,  3,  5,
+    9, 10, 11,  3,  5,
+    6,  7,  8,  2,  4,
+    3,  4,  5,  6, 11,
+    2,  7,  8,  9, 10
+};
+const U8 KeyMapY[31] PROGMEM = {
+   0,
+   9,  9,  9,  9,  9,
+   9,  9,  9,  9,  9,
+   1,  1,  1,  8,  8,
+   1,  1,  1,  8,  8,
+   1,  1,  1,  8,  8,
+   1,  8,  8,  8,  8
+};
+
 volatile char SwitchValue = 0;
 #define SWITCH_RAD 10
 #define SWITCH_DEG 11
