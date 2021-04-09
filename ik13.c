@@ -21,9 +21,9 @@ static void Ik13_control_signal(Ik13 *p, U8 n)
 		case 9: p->alu.beta |= p->s1; break;
 		case 10: p->alu.beta |= 6; break;
 		case 11: p->alu.beta |= 1; break;
-		case 12: p->alu.gamma |= p->l & 1; break;
-		case 13: p->alu.gamma |= ~p->l & 1; break;
-		case 14: p->alu.gamma |= ~p->t & 1; break;
+		case 12: p->alu.gamma |= p->l; break;
+		case 13: p->alu.gamma |= !p->l; break;
+		case 14: p->alu.gamma |= !p->t; break;
 		case 15: nibble_write (p->r.byte, p->tick,
 				nibble_read (p->r.byte, (p->tick + 3) % 42)); break;
 		case 16: nibble_write (p->r.byte, p->tick, p->alu.sigma); break;
