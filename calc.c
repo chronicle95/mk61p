@@ -25,16 +25,16 @@ void init_timer();
 void display_hex(U8, U8);
 void key_pressed(U8 *, U8 *, U8);
 
+Ik13 p1302;
+Ik13 p1303;
+Ik13 p1306;
+Ir2  m1;
+Ir2  m2;
+
 void main()
 {
 	init_io ();
 	init_timer ();
-
-	Ik13 p1302;
-	Ik13 p1303;
-	Ik13 p1306;
-	Ir2  m1;
-	Ir2  m2;
 
 	Ik13_init (&p1302, (Cmd23*)&cmds_1302, (Synch*)&syn_1302, (UCmd28*)&ucmds_1302);
 	Ik13_init (&p1303, (Cmd23*)&cmds_1303, (Synch*)&syn_1303, (UCmd28*)&ucmds_1303);

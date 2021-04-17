@@ -1,7 +1,7 @@
 #include "util.h"
 
 
-void nibble_write(U8 *arr, U8 addr, U8 value)
+void nibble_write4(U8 *arr, U8 addr, U8 value)
 {
 	U8 adiv2 = addr >> 1;
 	if (addr & 1)
@@ -14,7 +14,7 @@ void nibble_write(U8 *arr, U8 addr, U8 value)
 	}
 }
 
-U8 nibble_read(const U8 *arr, U8 addr)
+U8 nibble_read4(const U8 *arr, U8 addr)
 {
 	U8 adiv2 = addr >> 1;
 	if (addr & 1)

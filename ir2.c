@@ -12,8 +12,8 @@ void Ir2_init(Ir2 *m)
 
 void Ir2_step(Ir2 *m)
 {
-	m->wout = nibble_read (m->data, m->tick);
-	nibble_write (m->data, m->tick, m->win);
+	m->wout = nibble_read4 (m->data, m->tick);
+	nibble_write4 (m->data, m->tick, m->win);
 	m->tick++;
 	if (m->tick == 252) m->tick = 0;
 }

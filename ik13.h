@@ -12,7 +12,7 @@
 #include "util.h"
 
 
-typedef struct Reg42 { U8 byte[21]; } Reg42;   //42 nibbles
+typedef struct Reg42 { U8 byte[42]; } Reg42;   //42 nibbles
 typedef struct ALU
 {
 	U8 alpha;
