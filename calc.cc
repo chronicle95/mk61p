@@ -22,7 +22,11 @@
 
 void init_io();
 void init_timer();
-void display_hex(U8, U8);
+
+inline void display_hex(U8 n, U8 data)
+{
+	Display[n] = pgm_read_byte (&SegmentData[data]);
+}
 
 Ik13 p1302;
 Ik13 p1303;
@@ -121,11 +125,6 @@ void init_timer()
 	// reset the counter
 	TCNT0 = 0;
 	sei();
-}
-
-void display_hex(U8 n, U8 data)
-{
-	Display[n] = pgm_read_byte (&SegmentData[data]);
 }
 
 ISR(TIMER0_OVF_vect)
