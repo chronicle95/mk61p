@@ -1,6 +1,5 @@
 #include "util.h"
 
-
 void nibble_write4(U8 *arr, U8 addr, U8 value)
 {
 	U8 adiv2 = addr >> 1;

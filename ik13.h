@@ -11,23 +11,29 @@
 #include "types.h"
 #include "util.h"
 
+struct Reg42 {
+	U8 byte[42];
+};
 
-typedef struct Reg42 { U8 byte[42]; } Reg42;   //42 nibbles
-typedef struct ALU
+struct ALU
 {
 	U8 alpha;
 	U8 beta;
 	U8 gamma;
 	U8 sigma;
-} ALU;
+};
 
-typedef struct Ik13
+#define CHECK_BIT(arr, n) (arr[(n) >> 3] & (1 << ((n) & 7)))
+
+class Ik13
 {
+private:
 	const Cmd23  *commands;
 	const Synch  *sprograms;
 	const UCmd28 *ucommands;
 
 	// internal stuff
+	UCmd28 ucommand;
 	Cmd23 command;
 	U8 synaddr;
 	ALU   alu;
@@ -39,7 +45,8 @@ typedef struct Ik13
 	U8 l;
 	U8 t;
 	U8 p;
-	
+
+public:
 	// interface
 	U8 win;
 	U8 wout;
@@ -50,11 +57,16 @@ typedef struct Ik13
 	U8 key_y;
 	U8 disp_upd;
 	U8 disp_commas[14];
-} Ik13;
 
-#define CHECK_BIT(arr, n) (arr[(n) >> 3] & (1 << ((n) & 7)))
+private:
+	void runSignal(U8 n);
+	void runMicroCommand();
 
-void Ik13_init(Ik13 *, Cmd23 *, Synch *, UCmd28 *);
-void Ik13_step(Ik13 *);
+public:
+	void init(Cmd23 *rom_cmd, Synch *rom_syn, UCmd28 *rom_ucmd);
+	void step();
+	U8 readFromRegister(U8 addr);
+	void writeToMemory(U8 value);
+};
 
 #endif

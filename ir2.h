@@ -10,22 +10,22 @@
 
 #include "types.h"
 
-
-typedef struct Ir2
+class Ir2
 {
 	// 252 nibbles
 	U8 data[126];
 
+public:
 	// interface
 	U8 win;
 	U8 wout;
 
 	// for emulation purposes
 	U8 tick;
-} Ir2;
 
-
-void Ir2_init(Ir2 *);
-void Ir2_step(Ir2 *);
+public:
+	void init();
+	void step();
+};
 
 #endif

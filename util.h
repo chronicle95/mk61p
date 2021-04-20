@@ -3,7 +3,6 @@
 
 #include "types.h"
 
-
 inline void nibble_write(U8 *a, U8 i, U8 v)
 {
 	a[i] = v;
