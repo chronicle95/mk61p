@@ -9,10 +9,10 @@ void Ik13::runSignal(U8 n)
 	// CPU control signals carved in
 	switch (n)
 	{
-		case 0: alu.alpha |= nibble_read (r.byte, tick); break;
-		case 1: alu.alpha |= nibble_read (m.byte, tick); break;
-		case 2: alu.alpha |= nibble_read (st.byte, tick); break;
-		case 3: alu.alpha |= ~nibble_read (r.byte, tick) & 0b1111; break;
+		case 0: alu.alpha |= r.byte[tick]; break;
+		case 1: alu.alpha |= m.byte[tick]; break;
+		case 2: alu.alpha |= st.byte[tick]; break;
+		case 3: alu.alpha |= ~r.byte[tick] & 0b1111; break;
 		case 4: if (!l) alu.alpha |= 0xa; break;
 		case 5: alu.alpha |= s; break;
 		case 6: alu.alpha |= 4; break;
@@ -24,22 +24,16 @@ void Ik13::runSignal(U8 n)
 		case 12: alu.gamma |= l; break;
 		case 13: alu.gamma |= !l; break;
 		case 14: alu.gamma |= !t; break;
-		case 15: nibble_write (r.byte, tick,
-				nibble_read (r.byte, (tick + 3) % 42)); break;
-		case 16: nibble_write (r.byte, tick, alu.sigma); break;
-		case 17: nibble_write (r.byte, tick, s); break;
-		case 18: nibble_write (r.byte, tick,
-				nibble_read (r.byte, tick)
-				| s
-				| alu.sigma); break;
-		case 19: nibble_write (r.byte, tick, s | alu.sigma); break;
-		case 20: nibble_write (r.byte, tick,
-				nibble_read (r.byte, tick) | s); break;
-		case 21: nibble_write (r.byte, tick,
-				nibble_read (r.byte, tick) | alu.sigma); break;
-		case 22: nibble_write (r.byte, (tick + 41) % 42, alu.sigma); break;
-		case 23: nibble_write (r.byte, (tick + 40) % 42, alu.sigma); break;
-		case 24: nibble_write (m.byte, tick, s); break;
+		case 15: r.byte[tick] = r.byte[(tick + 3) % 42]; break;
+		case 16: r.byte[tick] = alu.sigma; break;
+		case 17: r.byte[tick] = s; break;
+		case 18: r.byte[tick] |= s | alu.sigma; break;
+		case 19: r.byte[tick] = s | alu.sigma; break;
+		case 20: r.byte[tick] |= s; break;
+		case 21: r.byte[tick] |= alu.sigma; break;
+		case 22: r.byte[(tick + 41) % 42] = alu.sigma; break;
+		case 23: r.byte[(tick + 40) % 42] = alu.sigma; break;
+		case 24: m.byte[tick] = s; break;
 		case 25: l = p; break;
 		case 26: s = s1; break;
 		case 27: s = alu.sigma; break;
@@ -48,27 +42,23 @@ void Ik13::runSignal(U8 n)
 		case 30: s1 = s1; break; // wat?
 		case 31: s1 = s1 | alu.sigma; break;
 		case 32:
-			nibble_write (st.byte, (tick + 2) % 42,
-					nibble_read (st.byte, (tick + 1) % 42));
-			nibble_write (st.byte, (tick + 1) % 42,
-					nibble_read (st.byte, tick));
-			nibble_write (st.byte, tick, alu.sigma);
+			st.byte[(tick + 2) % 42] = st.byte[(tick + 1) % 42];
+			st.byte[(tick + 1) % 42] = st.byte[tick];
+			st.byte[tick] = alu.sigma;
 			break;
 		case 33:
-			x = nibble_read (st.byte, tick);
-			nibble_write (st.byte, tick,
-					nibble_read (st.byte, (tick + 1) % 42));
-			nibble_write (st.byte, (tick + 1) % 42,
-					nibble_read (st.byte, (tick + 2) % 42));
-			nibble_write (st.byte, (tick + 2) % 42, x);
+			x = st.byte[tick];
+			st.byte[tick] = st.byte[(tick + 1) % 42];
+			st.byte[(tick + 1) % 42] = st.byte[(tick + 2) % 42];
+			st.byte[(tick + 2) % 42] = x;
 			break;
 		case 34:
-			x = nibble_read (st.byte, tick);
-			y = nibble_read (st.byte, (tick + 1) % 42);
-			z = nibble_read (st.byte, (tick + 2) % 42);
-			nibble_write (st.byte, tick, alu.sigma | y);
-			nibble_write (st.byte, (tick + 1) % 42, x | z);
-			nibble_write (st.byte, (tick + 2) % 42, y | x);
+			x = st.byte[tick];
+			y = st.byte[(tick + 1) % 42];
+			z = st.byte[(tick + 2) % 42];
+			st.byte[tick] = alu.sigma | y;
+			st.byte[(tick + 1) % 42] = x | z;
+			st.byte[(tick + 2) % 42] = y | x;
 			break;
 	}
 }
@@ -181,8 +171,7 @@ void Ik13::step()
 	if (tick == 0)
 	{
 		// fetch new command
-		U8 cmdaddr = (nibble_read (r.byte, 39) << 4)
-				| nibble_read (r.byte, 36);
+		U8 cmdaddr = (r.byte[39] << 4) | r.byte[36];
 		memcpy_P (&command, &commands[cmdaddr], sizeof (Cmd23));
 
 		if (command.byte[2] & 0b111111) t = 0;
@@ -212,8 +201,8 @@ void Ik13::step()
 			{
 				if (tick == 36)
 				{
-					nibble_write (r.byte, 37, synaddr);
-					nibble_write (r.byte, 40, synaddr >> 4);
+					r.byte[37] = synaddr & 0xf;
+					r.byte[40] = synaddr >> 4;
 				}
 				synaddr = 95;
 			}
@@ -242,18 +231,18 @@ void Ik13::step()
 	runMicroCommand ();
 
 	// read/write I/O data and update tick counter
-	wout = nibble_read (m.byte, tick);
-	nibble_write (m.byte, tick, win);
+	wout = m.byte[tick];
+	m.byte[tick] = win;
 	tick++;
 	if (tick == 42) tick = 0;
 }
 
 U8 Ik13::readFromRegister(U8 addr)
 {
-	return nibble_read (r.byte, addr);
+	return r.byte[addr];
 }
 
 void Ik13::writeToMemory(U8 value)
 {
-	nibble_write (m.byte, (tick + 41) % 42, value);
+	m.byte[(tick + 41) % 42] = value;
 }
