@@ -8,7 +8,13 @@
  *  - Set frequency to 8 MHz                                                 *
  *****************************************************************************/
 
+#ifdef __AVR_ATmega16__
 #define F_CPU 8000000UL
+#elif  __AVR_ATmega32__
+#define F_CPU 16000000UL
+#else
+#error Unsupported MCU
+#endif
 
 #include <avr/io.h>
 #include <avr/pgmspace.h>

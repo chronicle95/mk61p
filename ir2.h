@@ -13,7 +13,13 @@
 class Ir2
 {
 	// 252 nibbles
+#ifdef __AVR_ATmega16__
 	U8 data[126];
+#elif  __AVR_ATmega32__
+	U8 data[252];
+#else
+#error Unsupported MCU
+#endif
 
 public:
 	// interface
