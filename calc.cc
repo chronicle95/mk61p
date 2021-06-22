@@ -99,14 +99,14 @@ int main(void)
 				p1302.disp_upd = 0;
 			} 
 
-			// check for pressed keys
-			if (KeyValue != key)
-			{
-				key = KeyValue;
-				p1302.key_x = pgm_read_byte (&KeyMapX[key]);
-				p1302.key_y = pgm_read_byte (&KeyMapY[key]);
-			}
+			// pass through the pressed key
+			key = KeyValue;
+			p1302.key_x = pgm_read_byte (&KeyMapX[key]);
+			p1302.key_y = pgm_read_byte (&KeyMapY[key]);
 		}
+
+		p1302.key_x = 0;
+		p1302.key_y = 0;
 	}
 }
 
