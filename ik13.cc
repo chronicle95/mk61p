@@ -66,6 +66,7 @@ void Ik13::runSignal(U8 n)
 void Ik13::runMicroCommand()
 {
 	U8 third = tick / 3;
+	register U32 ucmd = *( (U32*) &ucommand );
 
 	alu.alpha = 0;
 	alu.beta  = 0;
@@ -79,8 +80,9 @@ void Ik13::runMicroCommand()
 
 	for (U8 bit = 0; bit < 12; bit++)
 	{
-		if (CHECK_BIT(ucommand.byte, bit))
+		if ((U8) ucmd & 1)
 			runSignal (bit);
+		ucmd >>= 1;
 	}
 
 	if (command.byte[2] & 0b111111)
@@ -100,8 +102,9 @@ void Ik13::runMicroCommand()
 
 	for (U8 bit = 12; bit < 15; bit++)
 	{
-		if (CHECK_BIT(ucommand.byte, bit))
+		if ((U8) ucmd & 1)
 			runSignal (bit);
+		ucmd >>= 1;
 	}
 
 	U8 sum = alu.alpha + alu.beta + alu.gamma;
@@ -111,30 +114,38 @@ void Ik13::runMicroCommand()
 	if (!CHECK_BIT(command.byte, 22) || (third == 12) || (third == 13))
 	{
 		// bits 17-15 of command 
-		U8 ucfield = ((ucommand.byte[2] & 0b11) << 1) | (ucommand.byte[1] >> 7);
+		U8 ucfield = (U8) ucmd & 0b111;
+		ucmd >>= 3;
 
 		if (ucfield)
 			runSignal (ucfield + 14);
 
-		for (U8 bit = 18; bit < 20; bit++)
+		for (U8 bit = 22; bit < 24; bit++)
 		{
-			if (CHECK_BIT(ucommand.byte, bit))
-				runSignal (bit + 4);
+			if ((U8) ucmd & 1)
+				runSignal (bit);
+			ucmd >>= 1;
 		}
 	}
-	
-	for (U8 bit = 20; bit < 22; bit++)
+	else
 	{
-		if (CHECK_BIT(ucommand.byte, bit))
-			runSignal (bit + 4);
+		ucmd >>= 5;
+	}
+	
+	for (U8 bit = 24; bit < 26; bit++)
+	{
+		if ((U8) ucmd & 1)
+			runSignal (bit);
+		ucmd >>= 1;
 	}
 
-	for (U8 i = 0; i < 3; i++)
+	for (U8 i = 25; i < 32; i += 3)
 	{
-		U8 ucfield = (!!CHECK_BIT(ucommand.byte, 23 + i * 2) << 1) | !!CHECK_BIT(ucommand.byte, 22 + i * 2);
+		U8 ucfield = (U8) ucmd & 0b11;
+		ucmd >>= 2;
 		if (ucfield)
 		{
-			runSignal (ucfield + 25 + i * 3);
+			runSignal (ucfield + i);
 		}
 	}
 }
