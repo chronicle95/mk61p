@@ -169,7 +169,7 @@ void Ik13::init(Cmd23 *rom_cmd, Synch *rom_syn, UCmd28 *rom_ucmd)
 	wout = 0;
 	win  = 0;
 
-	tick = 0;
+	nine_idx = nine_mod = tick = 0;
 	disp_upd = 0;
 	key_x = 0;
 	key_y = 0;
@@ -177,8 +177,6 @@ void Ik13::init(Cmd23 *rom_cmd, Synch *rom_syn, UCmd28 *rom_ucmd)
 
 void Ik13::step()
 {
-	Synch scmd;
-
 	if (tick == 0)
 	{
 		// fetch new command
@@ -189,8 +187,6 @@ void Ik13::step()
 	}
 
 	// derive synchroprogram address from command word
-	U8 nine_idx = tick / 9;
-	U8 nine_mod = tick % 9;
 	if ((nine_mod == 0) && !((nine_idx > 0) && (nine_idx < 3)))
 	{
 		if (nine_idx < 3)
@@ -219,11 +215,11 @@ void Ik13::step()
 			}
 		}
 
+		memcpy_P (&sprg, &sprograms[synaddr], sizeof (Synch));
 	}
 
 	// derive microcommand address from synchroprogram in a strange way
-	memcpy_P (&scmd, &sprograms[synaddr], sizeof (Synch));
-	U8 ucmdaddr = scmd.byte[
+	U8 ucmdaddr = sprg.byte[
 				(tick < 6) ? tick :
 				((tick < 21) ? (tick % 3 + 3) :
 				nine_mod)];
@@ -245,7 +241,18 @@ void Ik13::step()
 	wout = m.byte[tick];
 	m.byte[tick] = win;
 	tick++;
-	if (tick == 42) tick = 0;
+	nine_mod++;
+	if (nine_mod == 9)
+	{
+		nine_mod = 0;
+		nine_idx++;
+	}
+	if (tick == 42)
+	{
+		tick = 0;
+		nine_idx = 0;
+		nine_mod = 0;
+	}
 }
 
 U8 Ik13::readFromRegister(U8 addr)

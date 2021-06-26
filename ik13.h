@@ -34,6 +34,7 @@ private:
 
 	// internal stuff
 	UCmd28 ucommand;
+	Synch sprg;
 	Cmd23 command;
 	U8 synaddr;
 	ALU   alu;
@@ -53,6 +54,7 @@ public:
 
 	// for simulation purposes
 	U8 tick;
+	U8 nine_idx, nine_mod;
 	U8 key_x;
 	U8 key_y;
 	U8 disp_upd;
