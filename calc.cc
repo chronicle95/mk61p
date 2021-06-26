@@ -133,6 +133,8 @@ void init_timer()
 	sei();
 }
 
+volatile U8 _KeyValue;
+volatile U8 _KeyStatus;
 ISR(TIMER0_OVF_vect)
 {
 	// prevent other interrupts
@@ -144,21 +146,20 @@ ISR(TIMER0_OVF_vect)
 	{
 		char Off = 1;
 		for (; Tmp & 1; Off += 5, Tmp >>= 1);
-		KeyValue = Off + Column;
-		KeyStatus = KEYS_DOWN;
+		_KeyValue = Off + Column;
+		_KeyStatus = KEYS_DOWN;
 	}
-	SwitchValue = PINC & 0x80 ? SWITCH_DEG : SWITCH_RAD;
 
 	// calculate new column number and check key status
 	Column++;
 	if (Column == sizeof(Display))
 	{
-		if (KeyStatus == KEYS_UP)
-		{
-			KeyValue = KEY_NONE;
-		}
-		KeyStatus = KEYS_UP;
+		KeyStatus = _KeyStatus;
+		KeyValue  = _KeyValue;
+		SwitchValue = PINC & 0x80 ? SWITCH_DEG : SWITCH_RAD;
 		Column    = 0;
+		_KeyStatus = KEYS_UP;
+		_KeyValue  = KEY_NONE;
 	}
 
 	// clear segments to avoid shadowing
