@@ -61,6 +61,20 @@ int main(void)
 
 		for (U16 j = 0; j < 560; j++)
 		{
+			// pass through the pressed key
+			if (key != KeyValue)
+			{
+				key = KeyValue;
+				// wait a bit to eliminate key bounce
+				_delay_ms(50);
+				// register only when the key is pressed down
+				if ((key == KeyValue) && (KeyStatus == KEYS_DOWN))
+				{
+					p1302.key_x = pgm_read_byte (&KeyMapX[key]);
+					p1302.key_y = pgm_read_byte (&KeyMapY[key]);
+				}
+			}
+
 			// one full instruction cycle
 			for (U8 i = 0; i < 42; i++)
 			{
@@ -83,6 +97,10 @@ int main(void)
 				p1302.writeToMemory(m2.wout);
 			}
 
+			// reset any pressed key (to avoid glitches)
+			p1302.key_x = 0;
+			p1302.key_y = 0;
+
 			// need to update the display?
 			if (p1302.disp_upd)
 			{
@@ -98,15 +116,7 @@ int main(void)
 				}
 				p1302.disp_upd = 0;
 			} 
-
-			// pass through the pressed key
-			key = KeyValue;
-			p1302.key_x = pgm_read_byte (&KeyMapX[key]);
-			p1302.key_y = pgm_read_byte (&KeyMapY[key]);
 		}
-
-		p1302.key_x = 0;
-		p1302.key_y = 0;
 	}
 }
 
