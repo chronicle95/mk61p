@@ -166,7 +166,11 @@ ISR(TIMER0_OVF_vect)
 	{
 		KeyStatus = _KeyStatus;
 		KeyValue  = _KeyValue;
+#ifdef __AVR_ATmega16__ // board version 1
 		SwitchValue = PINC & 0x80 ? SWITCH_DEG : SWITCH_RAD;
+#else                   // any later version
+		SwitchValue = PINC & 0x80 ? SWITCH_RAD : SWITCH_DEG;
+#endif
 		Column    = 0;
 		_KeyStatus = KEYS_UP;
 		_KeyValue  = KEY_NONE;
