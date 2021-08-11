@@ -1,6 +1,15 @@
 /*****************************************************************************
  * MK61 Clone Calculator Firmware for ATmega16L/32A                          *
- * Based on https://pmk.arbinad.com/mk61emuweb.html                          *
+ * Main interface module                                                     *
+ *                                                                           *
+ * Ported from RusCalc project.                                              *
+ * https://habr.com/ru/post/505612 "MK-61: History,emulation,internals"      *
+ * http://mk-61.moy.su/emulator.html                                         *
+ * (which was in turns based on https://code.google.com/archive/p/emu145/    *
+ *  project by Felix Lazarev, svofski)                                       *
+ *                                                                           *
+ * Licensed under GNU GPL v3                                                 *
+ *                                                                           *
  * Port author: A.Bondarenko aka chronicle95                                 *
  * Date: 11/08/2021                                                          *
  *                                                                           *
