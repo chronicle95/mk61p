@@ -223,19 +223,23 @@ void Ik13::step()
 				(tick < 6) ? tick :
 				((tick < 21) ? (tick % 3 + 3) :
 				nine_mod)];
-	
-	// for addresses 60-63 we have conditional choice depending on the value of L:
-	//  if L == 1 they become 60, 62, 64, 66
-	//  if L == 0 they become 61, 63, 65, 67 respectively
-	ucmdaddr &= 0b111111;
-	if (ucmdaddr > 59)
-	{
-		ucmdaddr = ((ucmdaddr - 60) << 1) + !l + 60;
-	}
 
-	// fetch and execute current microcommand
-	memcpy_P (&ucommand, &ucommands[ucmdaddr], sizeof (ucommand));
-	runMicroCommand ();
+	// "00" is NOP, so skip it altogether
+	if (ucmdaddr)
+	{
+		// for addresses 60-63 we have conditional choice depending on the value of L:
+		//  if L == 1 they become 60, 62, 64, 66
+		//  if L == 0 they become 61, 63, 65, 67 respectively
+		ucmdaddr &= 0b111111;
+		if (ucmdaddr > 59)
+		{
+			ucmdaddr = ((ucmdaddr - 60) << 1) + !l + 60;
+		}
+
+		// fetch and execute current microcommand
+		memcpy_P (&ucommand, &ucommands[ucmdaddr], sizeof (ucommand));
+		runMicroCommand ();
+	}
 
 	// read/write I/O data and update tick counter
 	wout = m.byte[tick];
