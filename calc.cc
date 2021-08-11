@@ -1,11 +1,13 @@
 /*****************************************************************************
  * MK61 Clone Calculator Firmware for ATmega16L/32A                          *
- * Author: Artem Bondarenko aka chronicle95                                  *
- * Date: 25/03/2021                                                          *
+ * Based on https://pmk.arbinad.com/mk61emuweb.html                          *
+ * Port author: A.Bondarenko aka chronicle95                                 *
+ * Date: 11/08/2021                                                          *
  *                                                                           *
  * Notes:                                                                    *
  *  - Disable JTAG before flashing, it interferes with keypad.               *
- *  - Set frequency to 8 MHz                                                 *
+ *  - For board revision    1: internal oscillator 8 MHz (m16)               *
+ *  - For board revisions 2/3: external crystal oscillator 16 MHz (m32)      *
  *****************************************************************************/
 
 #ifdef __AVR_ATmega16__
