@@ -224,8 +224,21 @@ void Ik13::step()
 				((tick < 21) ? (tick % 3 + 3) :
 				nine_mod)];
 
-	// "00" is NOP, so skip it altogether
-	if (ucmdaddr)
+	// "01" (uc 0x00800001) is actually just S = R[tick]
+	if (ucmdaddr == 0x01)
+	{
+		s = r.byte[tick];
+	}
+	// "02" (uc 0x00040020) is R[tick-1] = S for specific commands in the end of a cycle
+	else if (ucmdaddr == 0x02)
+	{
+		if (!CHECK_BIT(command.byte, 22) || (tick >= 36))
+		{
+			r.byte[(tick + 41) % 42] = s;
+		}
+	}
+	// "00" is NOP, so skip it
+	else if (ucmdaddr)
 	{
 		// for addresses 60-63 we have conditional choice depending on the value of L:
 		//  if L == 1 they become 60, 62, 64, 66
