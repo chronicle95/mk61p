@@ -240,6 +240,12 @@ void Ik13::step()
 		case 0x08: // (uc 0x00800008) is S = ~R[tick]
 			s = ~r.byte[tick] & 0b1111;
 			break;
+		case 0x0b: // (uc 0x00080020) is R[tick-2] = S for specific commands in the end of a cycle
+			if (!CHECK_BIT(command.byte, 22) || (tick >= 36))
+			{
+				r.byte[(tick + 40) % 42] = s;
+			}
+			break;
 		default:
 			// for addresses 60-63 we have conditional choice depending on the value of L:
 			//  if L == 1 they become 60, 62, 64, 66
