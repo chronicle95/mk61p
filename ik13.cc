@@ -224,34 +224,32 @@ void Ik13::step()
 				((tick < 21) ? (tick % 3 + 3) :
 				nine_mod)];
 
-	// "01" (uc 0x00800001) is actually just S = R[tick]
-	if (ucmdaddr == 0x01)
+	switch (ucmdaddr)
 	{
-		s = r.byte[tick];
-	}
-	// "02" (uc 0x00040020) is R[tick-1] = S for specific commands in the end of a cycle
-	else if (ucmdaddr == 0x02)
-	{
-		if (!CHECK_BIT(command.byte, 22) || (tick >= 36))
-		{
-			r.byte[(tick + 41) % 42] = s;
-		}
-	}
-	// "00" is NOP, so skip it
-	else if (ucmdaddr)
-	{
-		// for addresses 60-63 we have conditional choice depending on the value of L:
-		//  if L == 1 they become 60, 62, 64, 66
-		//  if L == 0 they become 61, 63, 65, 67 respectively
-		ucmdaddr &= 0b111111;
-		if (ucmdaddr > 59)
-		{
-			ucmdaddr = ((ucmdaddr - 60) << 1) + !l + 60;
-		}
+		case 0x00: // "00" is NOP, do nothing
+			break;
+		case 0x01: // (uc 0x00800001) is actually just S = R[tick]
+			s = r.byte[tick];
+			break;
+		case 0x02: // (uc 0x00040020) is R[tick-1] = S for specific commands in the end of a cycle
+			if (!CHECK_BIT(command.byte, 22) || (tick >= 36))
+			{
+				r.byte[(tick + 41) % 42] = s;
+			}
+			break;
+		default:
+			// for addresses 60-63 we have conditional choice depending on the value of L:
+			//  if L == 1 they become 60, 62, 64, 66
+			//  if L == 0 they become 61, 63, 65, 67 respectively
+			ucmdaddr &= 0b111111;
+			if (ucmdaddr > 59)
+			{
+				ucmdaddr = ((ucmdaddr - 60) << 1) + !l + 60;
+			}
 
-		// fetch and execute current microcommand
-		memcpy_P (&ucommand, &ucommands[ucmdaddr], sizeof (ucommand));
-		runMicroCommand ();
+			// fetch and execute current microcommand
+			memcpy_P (&ucommand, &ucommands[ucmdaddr], sizeof (ucommand));
+			runMicroCommand ();
 	}
 
 	// read/write I/O data and update tick counter
