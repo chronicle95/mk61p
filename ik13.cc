@@ -237,6 +237,9 @@ void Ik13::step()
 				r.byte[(tick + 41) % 42] = s;
 			}
 			break;
+		case 0x03: // (uc 0x00800400) is S = 6
+			s = 6;
+			break;
 		case 0x04: // (uc 0x00008000)
 			if (!CHECK_BIT(command.byte, 22) || (tick >= 36))
 			{
