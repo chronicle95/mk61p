@@ -237,6 +237,9 @@ void Ik13::step()
 				r.byte[(tick + 41) % 42] = s;
 			}
 			break;
+		case 0x08: // (uc 0x00800008) is S = ~R[tick]
+			s = ~r.byte[tick] & 0b1111;
+			break;
 		default:
 			// for addresses 60-63 we have conditional choice depending on the value of L:
 			//  if L == 1 they become 60, 62, 64, 66
