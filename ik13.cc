@@ -246,6 +246,11 @@ void Ik13::step()
 				r.byte[tick] = r.byte[(tick + 3) % 42];
 			}
 			break;
+		case 0x06: // (uc 0x00800401) is S = R[tick] + 6, P = carry
+			s = r.byte[tick] + 6;
+			p = s >> 4;
+			s &= 0b1111;
+			break;
 		case 0x08: // (uc 0x00800008) is S = ~R[tick]
 			s = ~r.byte[tick] & 0b1111;
 			break;
