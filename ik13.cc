@@ -226,7 +226,7 @@ void Ik13::step()
 
 	switch (ucmdaddr)
 	{
-		case 0x00: // "00" is NOP, do nothing
+		case 0x00: // NOP, do nothing
 			break;
 		case 0x01: // (uc 0x00800001) is actually just S = R[tick]
 			s = r.byte[tick];
