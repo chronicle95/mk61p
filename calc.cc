@@ -17,6 +17,7 @@
  *  - Disable JTAG before flashing, it interferes with keypad.               *
  *  - For board revision    1: internal oscillator 8 MHz (m16)               *
  *  - For board revisions 2/3: external crystal oscillator 16 MHz (m32)      *
+ *                             set BODLEVEL = 1 (min voltage 2.7 V)          *
  *****************************************************************************/
 
 #ifdef __AVR_ATmega16__
